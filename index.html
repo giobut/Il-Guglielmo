@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Il Guglielmo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="blobs-container"><div class="blob b1"></div><div class="blob b2"></div></div>
+
+    <nav>
+        <div class="site-name"><span class="red">I</span>l <span class="red">G</span>uglielmo</div>
+    </nav>
+
+    <div id="view-home">
+        <div class="hero-wrapper">
+            <div class="hero-label">Ultime Notizie</div>
+            <div class="nav-arrow" style="left:20px" onclick="moveHero(-1)">&#10094;</div>
+            <div class="nav-arrow" style="right:20px" onclick="moveHero(1)">&#10095;</div>
+            <div class="carousel-track" id="track"></div>
+        </div>
+
+        <div class="sections-container" id="sections-container"></div>
+    </div>
+
+    <div class="search-container">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="search-input" placeholder="Cerca un argomento..." oninput="searchArticle()">
+        </div>
+    </div>
+
+    <div id="view-reader">
+        <div class="reader-hero"><img src="" id="r-hero" class="reader-img"></div>
+        <div class="reader-body">
+            <span id="r-cat" style="color:var(--accent); font-weight:bold; text-transform:uppercase;"></span>
+            <h1 id="r-title" style="margin: 15px 0; font-size: 42px;"></h1>
+            <p id="r-meta" style="color:#888; margin-bottom:40px;"></p>
+            <div id="r-text" style="font-size:19px; line-height:1.8; color:#eee;"></div>
+            <div class="gallery-grid" id="r-gallery"></div>
+        </div>
+        <button class="fab-home" onclick="closeReader()">TORNA ALLA HOME</button>
+    </div>
+
+    <script src="data.js"></script>
+    <script>
+        let curHero = 0;
+        let heroData = [];
+
+        function renderSite(data) {
+            const container = document.getElementById('sections-container');
+            container.innerHTML = "";
+            const cats = [...new Set(data.map(a => a.cat))];
+            
+            cats.forEach(c => {
+                const arts = data.filter(a => a.cat === c);
+                const cards = arts.map(a => `
+                    <div class="card" onclick="openArticle(${a.id})">
+                        <img src="${a.images[0]}" class="card-img">
+                        <div class="card-h">${a.title}</div>
+                        <p class="card-p">${a.text}</p>
+                    </div>`).join('');
+                
+                container.innerHTML += `
+                <div class="cat-block">
+                    <div class="cat-header">${c}</div>
+                    <div class="hz-scroll">${cards}</div>
+                </div>`;
+            });
+        }
+
+        function init() {
+            const all = [...ARTICOLI_DB].reverse();
+            heroData = all.slice(0, 5);
+            heroData.forEach(art => {
+                document.getElementById('track').innerHTML += `
+                <div class="slide" style="background-image:url('${art.images[0]}')" onclick="openArticle(${art.id})">
+                    <div class="slide-overlay"></div>
+                    <div class="slide-content"><h2 class="slide-title">${art.title}</h2></div>
+                </div>`;
+            });
+            renderSite(all);
+        }
+
+        function moveHero(dir) {
+            curHero = (curHero + dir + heroData.length) % heroData.length;
+            document.getElementById('track').style.transform = `translateX(-${curHero * 100}%)`;
+        }
+
+        function searchArticle() {
+            const term = document.getElementById('search-input').value.toLowerCase();
+            const filtered = ARTICOLI_DB.filter(a => 
+                a.title.toLowerCase().includes(term) || 
+                a.text.toLowerCase().includes(term) ||
+                a.cat.toLowerCase().includes(term)
+            ).reverse();
+            renderSite(filtered);
+        }
+
+        function openArticle(id) {
+            const a = ARTICOLI_DB.find(x => x.id === id);
+            document.getElementById('r-hero').src = a.images[0];
+            document.getElementById('r-cat').innerText = a.cat;
+            document.getElementById('r-title').innerText = a.title;
+            document.getElementById('r-meta').innerText = `Autore: ${a.auth} — ${a.date}`;
+            document.getElementById('r-text').innerHTML = a.text.replace(/\n/g, '<br><br>');
+            document.getElementById('view-reader').classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        function closeReader() { document.getElementById('view-reader').classList.remove('active'); }
+
+        init();
+    </script>
+</body>
+</html>
