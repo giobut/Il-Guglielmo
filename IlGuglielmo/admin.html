@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Pannello Redazione</title>
+    <style>
+        body { background: #0a0a0a; color: white; font-family: sans-serif; padding: 40px; max-width: 700px; margin: 0 auto; line-height: 1.6; }
+        .box { background: #151515; padding: 30px; border-radius: 16px; border: 1px solid #333; }
+        h1 { color: #D32F2F; margin-top: 0; }
+        label { display: block; margin-top: 15px; color: #888; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+        input, textarea, select { width: 100%; background: #222; border: 1px solid #444; color: white; padding: 12px; margin-top: 6px; border-radius: 8px; font-size: 15px; }
+        .btn-gen { background: #D32F2F; color: white; width: 100%; font-weight: bold; border: none; padding: 16px; border-radius: 8px; margin-top: 25px; cursor: pointer; }
+        #output { background: #000; color: #0f0; padding: 20px; border-radius: 8px; margin-top: 30px; font-family: monospace; font-size: 13px; display: none; white-space: pre-wrap; border: 1px solid #0f0; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>Nuovo Articolo</h1>
+        <label>Titolo</label>
+        <input type="text" id="titolo" placeholder="Es: Gara di Robotica">
+        
+        <label>Autore</label>
+        <input type="text" id="autore" placeholder="Nome Cognome e Classe">
+
+        <label>Data di Pubblicazione</label>
+        <input type="text" id="data" placeholder="Es: 15 Febbraio 2026">
+
+        <label>Sezione (Tag)</label>
+        <select id="cat">
+            <option value="IL NOSTRO LICEO">IL NOSTRO LICEO</option>
+            <option value="DIARIO DI VIAGGIO">DIARIO DI VIAGGIO</option>
+            <option value="ATTUALITÀ">ATTUALITÀ</option>
+            <option value="SPORT">SPORT</option>
+            <option value="SCIENZA">SCIENZA</option>
+            <option value="CUCINA">CUCINA</option>
+            <option value="MUSICA">MUSICA</option>
+            <option value="MUSICA">ECONOMIA</option>
+        </select>
+
+        <label>Immagini (Inserisci i link separati da virgola)</label>
+        <textarea id="immagini" rows="3" placeholder="http://link1.jpg, http://link2.jpg..."></textarea>
+
+        <label>Testo Articolo</label>
+        <textarea id="testo" rows="8"></textarea>
+
+        <button class="btn-gen" onclick="generate()">GENERA CODICE</button>
+
+        <div id="output"></div>
+    </div>
+
+    <script>
+        function generate() {
+            const imgs = document.getElementById('immagini').value.split(',').map(s => s.trim()).filter(s => s !== "");
+            const newObj = {
+                id: Date.now(),
+                cat: document.getElementById('cat').value,
+                date: document.getElementById('data').value,
+                title: document.getElementById('titolo').value,
+                auth: document.getElementById('autore').value,
+                images: imgs,
+                text: document.getElementById('testo').value
+            };
+            const out = document.getElementById('output');
+            out.style.display = 'block';
+            out.innerText = "COPIA QUESTO E INCOLLALO IN DATA.JS:\n\n," + JSON.stringify(newObj, null, 4);
+        }
+    </script>
+</body>
+</html>
