@@ -71,4 +71,3 @@ const ARTICOLI_DB = [
 }
 
 ];
-
